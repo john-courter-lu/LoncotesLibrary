@@ -34,4 +34,25 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// endpoints 
+// Get all Materials
+// Get Materials by Genre and/or MaterialType
+//all the circulating materials. Include the Genre and MaterialType. Exclude materials that have a OutOfCirculationSince value.
+app.MapGet("/api/materials", (LoncotesLibraryDbContext db) =>
+{
+
+
+    return db.Materials
+    .Where(m => m.OutOfCirculationSince == null)
+    .Include(m => m.Genre)
+    .Include(m => m.MaterialType)
+    .ToList();
+    
+    /* (LoncotesLibraryDbContext db) : dependency injection, where the framework sees a dependency that the handler requires, and passes in an instance of it as an arg so that the handler can use it. */
+});
+
+
+
+
+
 app.Run();
