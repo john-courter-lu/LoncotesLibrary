@@ -7,17 +7,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-    // allows passing datetimes without time zone data 
-    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+// allows passing datetimes without time zone data 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-    // allows our api endpoints to access the database through Entity Framework Core
-    builder.Services.AddNpgsql<LoncotesLibraryDbContext>(builder.Configuration["LoncotesLibraryDbConnectionString"]);
+// allows our api endpoints to access the database through Entity Framework Core
+builder.Services.AddNpgsql<LoncotesLibraryDbContext>(builder.Configuration["LoncotesLibraryDbConnectionString"]);
 
-    // Set the JSON serializer options
-    builder.Services.Configure<JsonOptions>(options =>
-    {
-        options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-    });
+// Set the JSON serializer options
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -38,16 +38,41 @@ app.UseHttpsRedirection();
 // Get all Materials
 // Get Materials by Genre and/or MaterialType
 //all the circulating materials. Include the Genre and MaterialType. Exclude materials that have a OutOfCirculationSince value.
-app.MapGet("/api/materials", (LoncotesLibraryDbContext db) =>
+app.MapGet("/api/materials", (LoncotesLibraryDbContext db, int? materialTypeId, int? genreId) =>
 {
+    List<Material> circulatingMaterials = db.Materials
+      .Where(m => m.OutOfCirculationSince == null)
+      .Include(m => m.Genre)
+      .Include(m => m.MaterialType)
+      .ToList();
+
+    List<Material> matchedMaterials = circulatingMaterials;
+
+    if (materialTypeId != null && genreId != null)
+    {
+       matchedMaterials = circulatingMaterials
+            .FindAll(m => m.MaterialTypeId == materialTypeId && m.GenreId == genreId);
+
+    } else if (materialTypeId != null && genreId == null)
+    {
+       matchedMaterials = circulatingMaterials
+            .FindAll(m => m.MaterialTypeId == materialTypeId);
+
+    } else if(materialTypeId == null && genreId != null)
+    {
+               matchedMaterials = circulatingMaterials
+            .FindAll(m => m.GenreId == genreId);
+
+    }
+
+    if (matchedMaterials.Count == 0)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(matchedMaterials);
 
 
-    return db.Materials
-    .Where(m => m.OutOfCirculationSince == null)
-    .Include(m => m.Genre)
-    .Include(m => m.MaterialType)
-    .ToList();
-    
     /* (LoncotesLibraryDbContext db) : dependency injection, where the framework sees a dependency that the handler requires, and passes in an instance of it as an arg so that the handler can use it. */
 });
 
