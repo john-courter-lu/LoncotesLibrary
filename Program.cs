@@ -92,7 +92,12 @@ app.MapGet("/api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
 // inside ThenInclude, c or m or co, it doesn't matter.
 
 //4 Add a Material
-
+app.MapPost("/api/materials", (LoncotesLibraryDbContext db, Material material) =>
+{
+    db.Materials.Add(material);
+    db.SaveChanges();
+    return Results.Created($"/api/materials/{material.Id}", material);
+});
 
 
 
