@@ -35,8 +35,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // endpoints 
-// Get all Materials
-// Get Materials by Genre and/or MaterialType
+//1  Get all Materials
+//2  Get Materials by Genre and/or MaterialType
 //all the circulating materials. Include the Genre and MaterialType. Exclude materials that have a OutOfCirculationSince value.
 app.MapGet("/api/materials", (LoncotesLibraryDbContext db, int? materialTypeId, int? genreId) =>
 {
@@ -50,18 +50,20 @@ app.MapGet("/api/materials", (LoncotesLibraryDbContext db, int? materialTypeId, 
 
     if (materialTypeId != null && genreId != null)
     {
-       matchedMaterials = circulatingMaterials
-            .FindAll(m => m.MaterialTypeId == materialTypeId && m.GenreId == genreId);
+        matchedMaterials = circulatingMaterials
+             .FindAll(m => m.MaterialTypeId == materialTypeId && m.GenreId == genreId);
 
-    } else if (materialTypeId != null && genreId == null)
+    }
+    else if (materialTypeId != null && genreId == null)
     {
-       matchedMaterials = circulatingMaterials
-            .FindAll(m => m.MaterialTypeId == materialTypeId);
+        matchedMaterials = circulatingMaterials
+             .FindAll(m => m.MaterialTypeId == materialTypeId);
 
-    } else if(materialTypeId == null && genreId != null)
+    }
+    else if (materialTypeId == null && genreId != null)
     {
-               matchedMaterials = circulatingMaterials
-            .FindAll(m => m.GenreId == genreId);
+        matchedMaterials = circulatingMaterials
+     .FindAll(m => m.GenreId == genreId);
 
     }
 
@@ -76,6 +78,20 @@ app.MapGet("/api/materials", (LoncotesLibraryDbContext db, int? materialTypeId, 
     /* (LoncotesLibraryDbContext db) : dependency injection, where the framework sees a dependency that the handler requires, and passes in an instance of it as an arg so that the handler can use it. */
 });
 
+//3 Get Meterial by Id
+app.MapGet("/api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
+{
+    return db.Materials
+    .Include(m => m.Genre)
+    .Include(m => m.MaterialType)
+    .Include(m => m.Checkouts)
+        .ThenInclude(c => c.Patron)
+    .SingleOrDefault(m => m.Id == id);
+});
+
+// inside ThenInclude, c or m or co, it doesn't matter.
+
+//4 Add a Material
 
 
 

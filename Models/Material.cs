@@ -12,6 +12,7 @@ public class Material
     public int GenreId { get; set; }
     public Genre Genre { get; set; }
     public DateTime? OutOfCirculationSince { get; set; }
-    public List<Patron> Patrons { get; set; }
+    public List<Checkout> Checkouts { get; set; }
 
+    //EF Core can directly handle joint table, which is not the case in Book 2
 }

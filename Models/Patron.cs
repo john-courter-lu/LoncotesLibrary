@@ -14,7 +14,9 @@ public class Patron
     [Required]
     public string Email { get; set; }
     public bool IsActive { get; set; }
-    public List<Material> Materials { get; set; }
+    public List<Checkout> Checkouts { get; set; }
+
+    //EF Core can directly handle joint table, which is not the case in Book 2
 }
 
 //boolean is not nullable by default in C#, like int, so no [Required] needed, even if it's NN
