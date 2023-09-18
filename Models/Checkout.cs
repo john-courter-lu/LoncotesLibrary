@@ -32,7 +32,8 @@ public class Checkout
         }
     }
 
-    
+    //Add another calculated property to the Patron class called Balance that totals up the unpaid fines that a patron owes. Add a Paid property of type bool to the Checkout class that indicates whether a fee has been paid or not. 
+    public bool Paid => LateFee == null ? true : false;
 }
 
 // DateTime is not nullable by default in C#, so no [Reqiured] needed even if it's NN.
