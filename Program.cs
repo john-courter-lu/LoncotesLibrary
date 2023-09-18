@@ -158,7 +158,7 @@ app.MapPut("/api/patrons/{id}", (LoncotesLibraryDbContext db, int id, Patron upd
     {
         return Results.NotFound();
     }
-    
+
     patronToUpdate.Address = updatedPatron.Address;
     patronToUpdate.Email = updatedPatron.Email;
 
@@ -167,6 +167,22 @@ app.MapPut("/api/patrons/{id}", (LoncotesLibraryDbContext db, int id, Patron upd
     return Results.NoContent();
 });
 
+//11 Deactivate Patron or Re-activate Patron
+//if it's just a deactivation or a soft delete, MapDelete recommanded.
+app.MapPut("/api/patrons/{id}/edit-active-status", (LoncotesLibraryDbContext db, int id) =>
+{
+    Patron matchedPatron = db.Patrons.SingleOrDefault(p => p.Id == id);
 
+    if (matchedPatron == null)
+    {
+        return Results.NotFound();
+    }
+
+    matchedPatron.IsActive = !matchedPatron.IsActive;
+
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
 
 app.Run();
