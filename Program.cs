@@ -217,6 +217,22 @@ app.MapPost("/api/checkouts", (LoncotesLibraryDbContext db, Checkout newCheckout
 
 */
 
-//13 Return a Material
+//13 Return a Material. Add an endpoint expecting a checkout id, and update the checkout with a return date of DateTime.Today.
+app.MapPost("/api/checkouts/{id}/return", (LoncotesLibraryDbContext db, int id) =>
+{
+    Checkout checkoutToReturn = db.Checkouts.SingleOrDefault(checkout => checkout.Id == id);
+
+    if (checkoutToReturn == null)
+    {
+        return Results.NotFound();
+    }
+
+    checkoutToReturn.ReturnDate = DateTime.Today;
+    db.SaveChanges();
+    
+    return Results.NoContent();
+});
+
+
 
 app.Run();
