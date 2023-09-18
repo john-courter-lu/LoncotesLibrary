@@ -233,10 +233,21 @@ app.MapPost("/api/checkouts/{id}/return", (LoncotesLibraryDbContext db, int id) 
     return Results.NoContent();
 });
 
-//Chapter 3 Get #All Available Materials
+//Chapter 3 Get #All Available Materials  (with their genre and material type) 
 //currently available (not checked out, and not removed from circulation).
+app.MapGet("/api/materials/available", (LoncotesLibraryDbContext db) =>
+{
+    return db.Materials
+    .Where(m => m.OutOfCirculationSince == null)
+    .Where(m => m.Checkouts.All(co => co.ReturnDate != null)) // similar to FindAll()
+        .Include(m => m.Genre) 
+        .Include(m => m.MaterialType) 
+        .OrderBy(m => m.Id)
+    .ToList();
+});
 
 //Chapter 4 Get Overdue Checkouts
+
 
 //Chapter 5 Late Fees
 
