@@ -137,10 +137,10 @@ app.MapGet("/api/patrons/{patronId}", (LoncotesLibraryDbContext db, int patronId
 {
     var query = db.Patrons
         .Where(p => p.Id == patronId)
-        .Include(p => p.Checkouts) 
-            .ThenInclude(co => co.Material) 
+        .Include(p => p.Checkouts)
+            .ThenInclude(co => co.Material)
                 .ThenInclude(m => m.MaterialType)
-        .ToList() ;
+        .ToList();
 
     return Results.Ok(query);
 });
@@ -184,5 +184,39 @@ app.MapPut("/api/patrons/{id}/edit-active-status", (LoncotesLibraryDbContext db,
 
     return Results.NoContent();
 });
+
+//12 Checkout a Material
+app.MapPost("/api/checkouts", (LoncotesLibraryDbContext db, Checkout newCheckout) =>
+{
+
+    // Id will be taken care of by EF Core;
+    // Material, Patron will be taken care of by .Include() in other endpoints; or use SingleOrDefault
+    // ReturnDate is nullable so leave it out;
+
+    try
+    {
+        newCheckout.CheckoutDate = DateTime.Today;
+        db.Checkouts.Add(newCheckout);
+        db.SaveChanges();
+        return Results.Created($"/api/checkouts/{newCheckout.Id}", newCheckout);
+    }
+    catch (DbUpdateException) 
+    {
+        return Results.BadRequest("Invalid data submitted");
+    }
+    
+    // If the SaveChanges() method encounters any database-related issues (such as constraint violations or database connectivity problems), it can throw a DbUpdateException. 
+});
+
+/* json object to test
+
+{
+    "materialId": 2,
+    "patronId": 2
+}
+
+*/
+
+//13 Return a Material
 
 app.Run();
