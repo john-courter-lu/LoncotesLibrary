@@ -132,4 +132,17 @@ app.MapGet("/api/patrons", (LoncotesLibraryDbContext db) =>
     return Results.Ok(db.Patrons.ToList());
 });
 
+// 9 get a patron and include their checkouts, and further include the materials and their material types.
+app.MapGet("/api/patrons/{patronId}", (LoncotesLibraryDbContext db, int patronId) =>
+{
+    var query = db.Patrons
+        .Where(p => p.Id == patronId)
+        .Include(p => p.Checkouts) 
+            .ThenInclude(co => co.Material) 
+                .ThenInclude(m => m.MaterialType)
+        .ToList() ;
+        
+    return Results.Ok(query);
+});
+
 app.Run();
