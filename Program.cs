@@ -229,10 +229,25 @@ app.MapPost("/api/checkouts/{id}/return", (LoncotesLibraryDbContext db, int id) 
 
     checkoutToReturn.ReturnDate = DateTime.Today;
     db.SaveChanges();
-    
+
     return Results.NoContent();
 });
 
+//Chapter 3 Get #All Available Materials
+//currently available (not checked out, and not removed from circulation).
 
+//Chapter 4 Get Overdue Checkouts
+
+//Chapter 5 Late Fees
+
+//Last Chapter: Client App 
+app.MapGet("/api/checkouts", (LoncotesLibraryDbContext db) =>
+{
+    return db.Checkouts
+    .Include(p => p.Patron)
+    .Include(co => co.Material)
+        .ThenInclude(m => m.MaterialType)
+    .ToList();
+});
 
 app.Run();
