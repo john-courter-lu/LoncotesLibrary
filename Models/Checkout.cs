@@ -11,6 +11,28 @@ public class Checkout
     public Patron Patron { get; set; }
     public DateTime CheckoutDate { get; set; }
     public DateTime? ReturnDate { get; set; }
+    
+    private static decimal _lateFeePerDay = .50M;
+    public decimal? LateFee
+    {
+        get
+
+        {
+            //do logic to return fee...
+            DateTime dueDate = CheckoutDate.AddDays(Material.MaterialType.CheckoutDays);
+            if (ReturnDate != null && dueDate < ReturnDate)
+            {
+                int daysLate = ((DateTime)ReturnDate - dueDate).Days;
+                decimal fee = daysLate * _lateFeePerDay;
+                return fee;
+            }
+
+            //otherwise return null
+            return null;
+        }
+    }
+
+    
 }
 
 // DateTime is not nullable by default in C#, so no [Reqiured] needed even if it's NN.

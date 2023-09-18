@@ -261,6 +261,7 @@ app.MapGet("/checkouts/overdue", (LoncotesLibraryDbContext db) =>
 });
 
 //Chapter 5 Late Fees
+// in Checkout.cs 
 
 //Last Chapter: Client App 
 app.MapGet("/api/checkouts", (LoncotesLibraryDbContext db) =>
