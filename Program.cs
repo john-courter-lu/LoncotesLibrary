@@ -141,8 +141,32 @@ app.MapGet("/api/patrons/{patronId}", (LoncotesLibraryDbContext db, int patronId
             .ThenInclude(co => co.Material) 
                 .ThenInclude(m => m.MaterialType)
         .ToList() ;
-        
+
     return Results.Ok(query);
 });
+
+// 10 Update Patron; address or email changable only;
+app.MapPut("/api/patrons/{id}", (LoncotesLibraryDbContext db, int id, Patron updatedPatron) =>
+{
+    if (updatedPatron.Id != id)
+    {
+        return Results.BadRequest();
+    }
+
+    Patron patronToUpdate = db.Patrons.SingleOrDefault(p => p.Id == updatedPatron.Id);
+    if (patronToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    
+    patronToUpdate.Address = updatedPatron.Address;
+    patronToUpdate.Email = updatedPatron.Email;
+
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
+
+
 
 app.Run();
