@@ -247,7 +247,18 @@ app.MapGet("/api/materials/available", (LoncotesLibraryDbContext db) =>
 });
 
 //Chapter 4 Get Overdue Checkouts
-
+app.MapGet("/checkouts/overdue", (LoncotesLibraryDbContext db) =>
+{
+    return db.Checkouts
+    .Include(p => p.Patron)
+    .Include(co => co.Material)
+        .ThenInclude(m => m.MaterialType)
+    .Where(co =>
+        (DateTime.Today - co.CheckoutDate).Days > 
+        co.Material.MaterialType.CheckoutDays &&
+        co.ReturnDate == null)
+    .ToList();
+});
 
 //Chapter 5 Late Fees
 
