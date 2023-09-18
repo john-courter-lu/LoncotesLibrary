@@ -116,4 +116,20 @@ app.MapDelete("/api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
     return Results.NoContent();
 });
 
+//6 7 8 Get MaterialTypes; Get Genres; Get Patrons
+app.MapGet("/api/materialtypes", (LoncotesLibraryDbContext db) =>
+{
+    return db.MaterialTypes.ToList();
+});
+
+app.MapGet("/api/genres", (LoncotesLibraryDbContext db) =>
+{
+    return db.Genres.ToList();
+});
+
+app.MapGet("/api/patrons", (LoncotesLibraryDbContext db) =>
+{
+    return Results.Ok(db.Patrons.ToList());
+});
+
 app.Run();
