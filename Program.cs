@@ -90,6 +90,7 @@ app.MapGet("/api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
 });
 
 // inside ThenInclude, c or m or co, it doesn't matter.
+// improvement: return Results.NotFound() can be added for error handling.
 
 //4 Add a Material
 app.MapPost("/api/materials", (LoncotesLibraryDbContext db, Material material) =>
@@ -99,6 +100,20 @@ app.MapPost("/api/materials", (LoncotesLibraryDbContext db, Material material) =
     return Results.Created($"/api/materials/{material.Id}", material);
 });
 
+// 5 Remove a Material From Circulation
+// a soft delete, where a row is not deleted from the database, but instead has a flag that says the row is no longer active. (The endpoint to get all materials should already be filtering these items out.)
+// MapDelete? MapPut? depends on whether your are sending a payload. if not, I'd do a delete. but the stakes are low
+// test results: MapDelete doesn't have to involve .Remove, and you can still have access to its data via MapGet with {id}
 
+app.MapDelete("/api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
+{
+    Material matchedMaterial = db.Materials.SingleOrDefault(m => m.Id == id);
+
+    matchedMaterial.OutOfCirculationSince = DateTime.Now;
+
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
 
 app.Run();
