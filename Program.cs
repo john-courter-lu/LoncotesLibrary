@@ -247,7 +247,7 @@ app.MapGet("/api/materials/available", (LoncotesLibraryDbContext db) =>
 });
 
 //Chapter 4 Get Overdue Checkouts
-app.MapGet("/checkouts/overdue", (LoncotesLibraryDbContext db) =>
+app.MapGet("/api/checkouts/overdue", (LoncotesLibraryDbContext db) =>
 {
     return db.Checkouts
     .Include(p => p.Patron)
@@ -261,7 +261,7 @@ app.MapGet("/checkouts/overdue", (LoncotesLibraryDbContext db) =>
 });
 
 //Chapter 5 Late Fees
-// in Checkout.cs 
+// modification in Checkout.cs, Patron.cs
 
 //Last Chapter: Client App 
 app.MapGet("/api/checkouts", (LoncotesLibraryDbContext db) =>
